@@ -50,6 +50,7 @@ New-Item -Path $ps_profile_dir -ItemType Directory -Force
 New-Item -Path $ps_profile -ItemType File -ErrorAction SilentlyContinue
 $ps_profile_contents = @()
 $ps_profile_contents += '$env:path = "${env:path};${env:userprofile}\Documents\Programs\Git\cmd"'
+$ps_profile_contents += '$env:path = "${env:path};${env:userprofile}\Documents\Programs\Git\bin"'
 $ps_profile_contents += 'set-alias npp "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents += 'set-alias notepad "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents = $ps_profile_contents | where { !(Select-String -SimpleMatch "${_}" -Path ${ps_profile} -Quiet)}

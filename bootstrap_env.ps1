@@ -45,7 +45,7 @@ $msysgit_installer = "${download_dir}\msysgit.exe"
 # Install msysgit
 $msysgit_dir = "${program_dir}\Git"
 New-Item -Path $msysgit_dir -ItemType Directory -Force
-$msysgit_params = "/SP- /VERYSILENT /NORESTART /DIR=`"${msysgit_dir}`" /COMPONENTS=`"icons,icons\quicklaunch,icons\desktop,ext\cheetah,assoc,assoc_sh`""
+$msysgit_params = "/SP- /VERYSILENT /SUPPRESSMSGBOXES /NOCLOSEAPPLICATIONS /NORESTART /DIR=`"${msysgit_dir}`" /COMPONENTS=`"icons,icons\quicklaunch,icons\desktop,ext,ext\cheetah,assoc,assoc_sh`""
 Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -NoNewWindow -PassThru -Wait
 
 

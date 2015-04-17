@@ -1,22 +1,22 @@
 [CmdLetBinding()]
 Param(
-[Parameter(Mandatory=$true,Position=0]
-[string] $git_username
-,
-[Parameter(Mandatory=$true,Position=1]
-[string] $git_email
-,
-[Parameter(Mandatory=$false]
-[string] $download_dir="${env:userprofile}\Downloads"
-,
-[Parameter(Mandatory=$false]
-[string] $program_dir="${env:userprofile}\Documents\Programs"
-,
-[Parameter(Mandatory=$false]
-[string] $npp_url="http://notepad-plus-plus.org/repository/6.x/6.7.7/npp.6.7.7.bin.zip"
-,
-[Parameter(Mandatory=$false]
-[string] $msysgit_url="https://github.com/msysgit/msysgit/releases/download/Git-1.9.5-preview20150319/Git-1.9.5-preview20150319.exe"
+    [Parameter(Mandatory=$true,Position=0)]
+    [string] $git_username
+    ,
+    [Parameter(Mandatory=$true,Position=1)]
+    [string] $git_email
+    ,
+    [Parameter(Mandatory=$false)]
+    [string] $download_dir="${env:userprofile}\Downloads"
+    ,
+    [Parameter(Mandatory=$false)]
+    [string] $program_dir="${env:userprofile}\Documents\Programs"
+    ,
+    [Parameter(Mandatory=$false)]
+    [string] $npp_url="http://notepad-plus-plus.org/repository/6.x/6.7.7/npp.6.7.7.bin.zip"
+    ,
+    [Parameter(Mandatory=$false)]
+    [string] $msysgit_url="https://github.com/msysgit/msysgit/releases/download/Git-1.9.5-preview20150319/Git-1.9.5-preview20150319.exe"
 )
 
 

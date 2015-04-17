@@ -1,3 +1,7 @@
+$git_username = ""
+$git_email = ""
+$git_dir = "${env:userprofile}\Documents\git"
+
 $npp_url = "http://notepad-plus-plus.org/repository/6.x/6.7.7/npp.6.7.7.bin.zip"
 $msysgit_url = "https://github.com/msysgit/msysgit/releases/download/Git-1.9.5-preview20150319/Git-1.9.5-preview20150319.exe"
 
@@ -8,7 +12,7 @@ $program_dir = "${env:userprofile}\Documents\Programs"
 # Create user dirs
 New-Item -Path $download_dir -ItemType Directory -Force
 New-Item -Path $program_dir -ItemType Directory -Force
-
+New-Item -Path $git_dir -ItemType Directory -Force
 
 # Get npp zip file
 $npp_zipfile = "${download_dir}\npp.zip"
@@ -34,6 +38,11 @@ $msysgit_params = "/SP- /VERYSILENT /NORESTART /DIR=`"${msysgit_dir}`" /COMPONEN
 Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -NoNewWindow -PassThru -Wait
 
 
+# Setup git
+& "git config --global user.name ${git_username}"
+& "git config --global user.email ${git_email}"
+
+
 # Setup PowerShell Profile
 $ps_profile_dir = "${env:userprofile}\Documents\WindowsPowerShell"
 $ps_profile = "${ps_profile_dir}\Microsoft.PowerShell_profile.ps1"
@@ -54,6 +63,7 @@ cd "${program_dir}"
 git clone https://github.com/dahlbyk/posh-git.git
 cd posh-git
 iex ".\install.ps1"
+
 
 # Load ps profile
 iex ". $PROFILE"

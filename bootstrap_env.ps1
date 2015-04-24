@@ -53,7 +53,7 @@ Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -No
 $env:path += ";${msysgit_dir}\cmd;${msysgit_dir}\bin"
 iex "git config --global user.name ${git_username}"
 iex "git config --global user.email ${git_email}"
-
+iex "git config --global core.editor $(${npp_dir}.replace('\','/'))/notepad++.exe"
 
 # Setup PowerShell Profile
 $ps_profile_dir = "${env:userprofile}\Documents\WindowsPowerShell"

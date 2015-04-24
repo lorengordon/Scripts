@@ -55,6 +55,12 @@ iex "git config --global user.name ${git_username}"
 iex "git config --global user.email ${git_email}"
 iex "git config --global core.editor $(${npp_dir}.replace('\','/'))/notepad++.exe"  # Git config requires unix-style path separators
 
+
+# Create ssh dir
+$ssh_dir = "${env:userprofile}\.ssh"
+New-Item -Path $ssh_dir -ItemType Directory -Force
+
+
 # Setup PowerShell Profile
 $ps_profile_dir = "${env:userprofile}\Documents\WindowsPowerShell"
 $ps_profile = "${ps_profile_dir}\Microsoft.PowerShell_profile.ps1"

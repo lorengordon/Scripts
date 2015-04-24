@@ -50,6 +50,7 @@ Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -No
 
 
 # Setup basic git settings
+$env:path += ";${msysgit_dir}\cmd;${msysgit_dir}\bin"
 iex "git config --global user.name ${git_username}"
 iex "git config --global user.email ${git_email}"
 
@@ -60,8 +61,7 @@ $ps_profile = "${ps_profile_dir}\Microsoft.PowerShell_profile.ps1"
 New-Item -Path $ps_profile_dir -ItemType Directory -Force
 New-Item -Path $ps_profile -ItemType File -ErrorAction SilentlyContinue
 $ps_profile_contents = @()
-$ps_profile_contents += '$env:path = "${env:path};${env:userprofile}\Documents\Programs\Git\cmd"'
-$ps_profile_contents += '$env:path = "${env:path};${env:userprofile}\Documents\Programs\Git\bin"'
+$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\cmd;${env:userprofile}\Documents\Programs\Git\bin"'
 $ps_profile_contents += 'set-alias npp "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents += 'set-alias notepad "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents = $ps_profile_contents | where { !(Select-String -SimpleMatch "${_}" -Path ${ps_profile} -Quiet)}
@@ -70,7 +70,6 @@ $ps_profile_contents,(Get-Content -Path $ps_profile) | Set-Content -Path ${ps_pr
 
 # Install posh-git
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
-$env:path = "${env:path};${msysgit_dir}\cmd"
 cd "${program_dir}"
 iex "git clone https://github.com/dahlbyk/posh-git.git"
 cd posh-git

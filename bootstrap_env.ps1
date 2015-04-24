@@ -37,6 +37,30 @@ $shell = new-object -com shell.application
 $shell.namespace($npp_dir).copyhere($shell.namespace("$npp_zipfile").items(), 0x14) 
 
 
+#TODO: Use ftypes and assoc to build the list of text file types automatically
+#$notepad_ftypes = cmd /c ftype | where { $_ -match "notepad"} | % {$_.split('=')[0] }
+
+# List of text file types handled by notepad by default
+$text_ftypes = @(
+	".compositefont", ".css", ".dic", ".exc", ".gitattributes", ".gitignore"
+	".gitmodules", ".inf", ".ini", ".log", ".oqy", ",ps1", ".ps1xml", ".psd1"
+	".psm1", ".rqy", ".scp", ".sct", ".txt", ".wsc", ".wtx"
+)
+
+
+# Add handler for npp
+iex @'
+reg add `"HKCU\Software\Classes\Applications\notepad++.exe\shell\open\command`" /ve /t REG_SZ /d `"\`"${npp_dir}\notepad++.exe\`" \`"%1\`"`" /f
+'@
+
+
+# Make npp the default for all text file types
+$text_ftypes | % { iex @'
+reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\UserChoice`" /v `"Progid`" /t REG_SZ /d `"Applications\notepad++.exe`" /f
+'@
+}
+
+
 # Get msysgit installer
 $msysgit_installer = "${download_dir}\msysgit.exe"
 (new-object net.webclient).DownloadFile("${msysgit_url}","${msysgit_installer}")

@@ -79,6 +79,7 @@ iex "git config --global user.name ${git_username}"
 iex "git config --global user.email ${git_email}"
 iex "git config --global core.autocrlf false"
 iex "git config --global core.editor $(${npp_dir}.replace('\','/'))/notepad++.exe"  # Git config requires unix-style path separators
+iex "git config --global branch.autosetuprebase always"
 
 
 # Create ssh dir

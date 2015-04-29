@@ -81,6 +81,7 @@ iex "git config --global core.autocrlf false"
 iex "git config --global core.editor $(${npp_dir}.replace('\','/'))/notepad++.exe"  # Git config requires unix-style path separators
 iex "git config --global branch.autosetuprebase always"
 iex "git config --global credential.helper wincred"
+iex "git config --global push.default simple"
 
 
 # Create ssh dir

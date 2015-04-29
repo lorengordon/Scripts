@@ -84,9 +84,20 @@ iex "git config --global credential.helper wincred"
 iex "git config --global push.default simple"
 
 
-# Create ssh dir
+# Configure ssh over https
 $ssh_dir = "${env:userprofile}\.ssh"
+$ssh_config_file = "${ssh_dir}\config"
 New-Item -Path $ssh_dir -ItemType Directory -Force
+New-Item -Path $ssh_config_file -ItemType File -ErrorAction SilentlyContinue
+$ssh_config_contents = @(Get-Content -Path $ssh_config_file)
+$ssh_config = @()
+$ssh_config += "Host github.com"
+$ssh_config += "  Hostname ssh.github.com"
+$ssh_config += "  Port 443"
+$ssh_config += ""
+if (-not $ssh_config_contents -contains "Host github.com") {
+	Set-Content -Value $ssh_config,$ssh_config_contents -Path $ssh_config_file
+}
 
 
 # Setup PowerShell Profile

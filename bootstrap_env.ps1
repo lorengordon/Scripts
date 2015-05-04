@@ -43,7 +43,7 @@ $shell.namespace($npp_dir).copyhere($shell.namespace("$npp_zipfile").items(), 0x
 # List of text file types handled by notepad by default
 $text_ftypes = @(
 	".compositefont", ".css", ".dic", ".exc", ".gitattributes", ".gitignore"
-	".gitmodules", ".inf", ".ini", ".log", ".oqy", ",ps1", ".ps1xml", ".psd1"
+	".gitmodules", ".inf", ".ini", ".log", ".oqy", ".ps1", ".ps1xml", ".psd1"
 	".psm1", ".rqy", ".scp", ".sct", ".txt", ".wsc", ".wtx"
 )
 

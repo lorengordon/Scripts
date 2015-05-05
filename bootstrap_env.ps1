@@ -13,6 +13,9 @@ Param(
     [string] $program_dir="${env:userprofile}\Documents\Programs"
     ,
     [Parameter(Mandatory=$false)]
+    [string] $python27_url="https://www.python.org/ftp/python/2.7.9/python-2.7.9.amd64.msi"
+    ,
+    [Parameter(Mandatory=$false)]
     [string] $npp_url="http://notepad-plus-plus.org/repository/6.x/6.7.7/npp.6.7.7.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
@@ -26,6 +29,18 @@ Param(
 # Create user dirs
 New-Item -Path $download_dir -ItemType Directory -Force
 New-Item -Path $program_dir -ItemType Directory -Force
+
+
+# Get python27 installer
+$python27_installer = "${download_dir}\python27.msi"
+(new-object net.webclient).DownloadFile("${python27_url}","${python27_installer}")
+
+
+# Install python
+$python27_dir = "${program_dir}\Python27"
+New-Item -Path $python27_dir -ItemType Directory -Force
+$python27_params = "/i `"${python27_installer}`" /quiet /qn /norestart TARGETDIR=`"${python27_dir}`" ADDLOCAL=ALL"
+Start-Process -FilePath msiexec -ArgumentList ${python27_params} -NoNewWindow -PassThru -Wait
 
 
 # Get npp zip file
@@ -108,7 +123,10 @@ $ps_profile = "${ps_profile_dir}\Microsoft.PowerShell_profile.ps1"
 New-Item -Path $ps_profile_dir -ItemType Directory -Force
 New-Item -Path $ps_profile -ItemType File -ErrorAction SilentlyContinue
 $ps_profile_contents = @()
-$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\cmd;${env:userprofile}\Documents\Programs\Git\bin"'
+$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\cmd"'
+$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\bin"'
+$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27"'
+$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27\Scripts"'
 $ps_profile_contents += 'set-alias npp "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents += 'set-alias notepad "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents = $ps_profile_contents | where { !(Select-String -SimpleMatch "${_}" -Path ${ps_profile} -Quiet)}

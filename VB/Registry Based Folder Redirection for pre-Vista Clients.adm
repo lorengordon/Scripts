@@ -1,0 +1,74 @@
+; Registry Based Folder Redirection for pre-Vista Clients.adm
+;
+; Group Policy Template (.ADM) to provide redirection of shell folders
+; in Windows XP that are not redirected using folder redirection policies
+;
+; See the Windows Administration Resource Kit for documentation
+;
+; Neither Microsoft nor Intelliem guarantee the performance
+; of scripting examples or tools.
+;
+; See www.intelliem.com/resourcekit for updates to this tool
+;
+; (c) 2007 Intelliem, Inc.
+
+CLASS USER
+
+CATEGORY !!Redirect
+
+                KEYNAME "Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders"
+
+                POLICY !!Favorites
+			EXPLAIN !!FavoritesExplain
+                        PART !!FavoritesPath         EDITTEXT REQUIRED  EXPANDABLETEXT
+                        DEFAULT !!FavoritesDefault
+                        VALUENAME "Favorites"
+                        END PART
+                END POLICY
+
+                POLICY !!Music
+			EXPLAIN !!MusicExplain
+                        PART !!MusicPath         EDITTEXT REQUIRED  EXPANDABLETEXT
+                        DEFAULT !!MusicDefault
+                        VALUENAME "My Music"
+                        END PART
+                END POLICY
+
+                POLICY !!Pictures
+			EXPLAIN !!PicturesExplain
+                        PART !!PicturesPath         EDITTEXT REQUIRED  EXPANDABLETEXT
+                        DEFAULT !!PicturesDefault
+                        VALUENAME "My Pictures"
+                        END PART
+                END POLICY
+
+                POLICY !!Videos
+			EXPLAIN !!VideosExplain
+                        PART !!VideosPath         EDITTEXT REQUIRED  EXPANDABLETEXT
+                        DEFAULT !!VideosDefault
+                        VALUENAME "My Video"
+			; That is not a typo: the value is My Video (singular)
+                        END PART
+                END POLICY
+
+END CATEGORY
+
+
+[strings]
+Redirect="Folder redirection - registry based"
+Favorites="Favorites"
+FavoritesPath="Target of Favorites"
+FavoritesDefault="%USERPROFILE%\Favorites"
+Music="Music"
+MusicPath="Target of My Music"
+MusicDefault="%USERPROFILE%\My Documents\My Music"
+Pictures="Pictures"
+PicturesPath="Target of My Pictures"
+PicturesDefault="%USERPROFILE%\My Documents\My Pictures"
+Videos="Videos"
+VideosPath="Target of My Videos"
+VideosDefault="%USERPROFILE%\My Documents\My Videos"
+FavoritesExplain="Path to the location of Favorites. Supports redirection through the registry for pre-Vista clients. It is recommended to use standard folder redirection policies for systems running Windows Vista and later. To create an environment that provides a user access to Favorites from both Windows XP and Windows Vista systems, use this policy for Windows XP and also a folder redirection policy for Favorites, which will only apply to Windows Vista clients. Use the same path as the target for both policies."
+MusicExplain="Path to the location of (My) Music. Supports redirection through the registry for pre-Vista clients. It is recommended to use standard folder redirection policies for systems running Windows Vista and later. To create an environment that provides a user access to (My) Music from both Windows XP and Windows Vista systems, use this policy for Windows XP and also a folder redirection policy for Music, which will only apply to Windows Vista clients. Use the same path as the target for both policies."
+PicturesExplain="Path to the location of (My) Pictures. Supports redirection through the registry for pre-Vista clients. It is recommended to use standard folder redirection policies for systems running Windows Vista and later. To create an environment that provides a user access to (My) Pictures from both Windows XP and Windows Vista systems, you can use the Pictures folder redirection policy. Just be sure to select the option on the Settings tab, 'Also apply... to Windows XP.' Alternatively, you can use this registry redirection policy for Windows XP and a folder redirection policy for Pictures for Vista clients. In that case, DEselect the option 'Also apply... to Windows XP' so that it only applies to Windows Vista clients, and use the same path as the target for both policies. You could also choose to use folder redirection policy and apply it to Windows XP clients."
+VideosExplain="Path to the location of (My) Videos.  Supports redirection through the registry for pre-Vista clients. It is recommended to use standard folder redirection policies for systems running Windows Vista and later. To create an environment that provides a user access to (My) Videos from both Windows XP and Windows Vista systems, use this policy for Windows XP and also a folder redirection policy for Videos, which will only apply to Windows Vista clients. Use the same path as the target for both policies."

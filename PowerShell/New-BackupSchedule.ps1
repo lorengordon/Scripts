@@ -35,6 +35,7 @@ $WorkingDir = "${SystemDrive}\Backup-WorkingFiles" #Location on the system to sa
 $LogDir = "${WorkingDir}\Logs" #Location on the system to save log files.
 $BackupName = "${ComputerName}_${DateTime}_"
 $DshScriptFile = "${WorkingDir}\${BackupName}.dsh"
+$ExecScriptFile = ""
 $VssMetadataFile = "${WorkingDir}\${BackupName}.cab"
 
 $RemainingArgsHash = $RemainingArgs | ForEach-Object -Begin { $index = 0; $hash = @{} } -Process { if ($_ -match "^-.*:$") { $hash[($_.trim("-",":"))] = $RemainingArgs[$index+1] }; $index++ } -End { Write-Output $hash }
@@ -162,7 +163,7 @@ log "RemainingArgsHash = $(($RemainingArgsHash.GetEnumerator() | % { `"-{0}: {1}
 $FixedVolumes = Get-Volume | where { $_.DriveType -eq "Fixed" }
 
 # Create the diskshadow script file
-CreateDshScript -Volumes $FixedVolumes -VssMetaDataFile $VssMetaDataFile -ExecScript $ExecScript -RequiredVssWriters $RequiredVssWriters -CleanupVssSnapshots:$false | Set-Content $DshScriptFile
+CreateDshScript -Volumes $FixedVolumes -VssMetaDataFile $VssMetaDataFile -ExecScript $ExecScriptFile -RequiredVssWriters $RequiredVssWriters -CleanupVssSnapshots:$false | Set-Content $DshScriptFile
 
 # Execute diskshadow with the script file (this creates vss snapshots of the volumes specified in $dshscriptfile)
 diskshadow.exe /s ${DshScriptFile}

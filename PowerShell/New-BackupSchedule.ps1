@@ -62,14 +62,13 @@ function CreateDshScript {
 	[CmdLetBinding()]
 	Param(
 		[Parameter(Mandatory=$true)]
-        $Volumes
+        [Microsoft.Management.Infrastructure.CimInstance[]] $Volumes
         ,
 		[Parameter(Mandatory=$true)]
         [string] $VssMetaDataFile
         ,
 		[Parameter(Mandatory=$false)]
-        [string] 
-        $ExecScript
+        [string] $ExecScript
         ,
 		[Parameter(Mandatory=$false)]
         [string[]] $RequiredVssWriters
@@ -94,7 +93,15 @@ function CreateDshScript {
                        }
                    )
     }
-    END {
+    END 
+    {
+        # Initialize internal variables
+        $NoWriters = ""
+        $VssWriterStrings = @()
+        $VolumeStrings = @()
+        $ExecStrings = @()
+        $DeleteShadows = @()
+        
         #Check for QuiesceFileSystem switch 
         if (-not $QuiesceFileSystem) {
             $NoWriters = "NOWRITERS"
@@ -102,17 +109,14 @@ function CreateDshScript {
         
         #Construct Dsh strings for required VSS writers 
         if ($RequiredVssWriters) { 
-            $VssWriterStrings = @()
             $VssWriters | where { $_["WriterName"] -in ${RequiredVssWriters} } | foreach { $VssWriterStrings += "WRITER VERIFY $($_["WriterID"])" } 
         }
         
         #Construct Dsh strings for volumes to snapshot
-        $VolumesStrings = @()
         $Volumes | foreach { $VolumesStrings += "ADD VOLUME $($_.path)" }
 
         #Construct Dsh strings for the script to execute
         if ( $ExecScript ) { 
-            $ExecStrings = @()
             $ExecStrings += "EXEC ${ExecScript}" 
         }
 

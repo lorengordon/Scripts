@@ -161,8 +161,10 @@ log "RemainingArgsHash = $(($RemainingArgsHash.GetEnumerator() | % { `"-{0}: {1}
 #Get all the fixed disk volumes
 $FixedVolumes = Get-Volume | where { $_.DriveType -eq "Fixed" }
 
+# Create the diskshadow script file
 CreateDshScript -Volumes $FixedVolumes -VssMetaDataFile $VssMetaDataFile -ExecScript $ExecScript -RequiredVssWriters $RequiredVssWriters -CleanupVssSnapshots:$false | Set-Content $DshScriptFile
 
+# Execute diskshadow with the script file (this creates vss snapshots of the volumes specified in $dshscriptfile)
 diskshadow.exe /s ${DshScriptFile}
 
 ###

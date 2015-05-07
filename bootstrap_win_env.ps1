@@ -16,6 +16,9 @@ Param(
     [string] $python27_url="https://www.python.org/ftp/python/2.7.9/python-2.7.9.amd64.msi"
     ,
     [Parameter(Mandatory=$false)]
+    [string] $vc_python27_url="http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi"
+    ,
+    [Parameter(Mandatory=$false)]
     [string] $npp_url="http://notepad-plus-plus.org/repository/6.x/6.7.7/npp.6.7.7.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
@@ -36,11 +39,21 @@ $python27_installer = "${download_dir}\python27.msi"
 (new-object net.webclient).DownloadFile("${python27_url}","${python27_installer}")
 
 
-# Install python
+# Install python27
 $python27_dir = "${program_dir}\Python27"
 New-Item -Path $python27_dir -ItemType Directory -Force
 $python27_params = "/i `"${python27_installer}`" /quiet /qn /norestart TARGETDIR=`"${python27_dir}`" ADDLOCAL=ALL"
 Start-Process -FilePath msiexec -ArgumentList ${python27_params} -NoNewWindow -PassThru -Wait
+
+
+# Get vc_python27 installer
+$vc_python27_installer = "${download_dir}\vc_python27.msi"
+(new-object net.webclient).DownloadFile("${vc_python27_url}","${vc_python27_installer}")
+
+
+# Install python
+$vc_python27_params = "/i `"${vc_python27_installer}`" /quiet /qn /norestart"
+Start-Process -FilePath msiexec -ArgumentList ${vc_python27_params} -NoNewWindow -PassThru -Wait
 
 
 # Get npp zip file
@@ -127,6 +140,7 @@ $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Gi
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\bin"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27\Scripts"'
+$ps_profile_contents += '$env:path += ";${env:localappdata}\Programs\Common\Microsoft\Visual C++ for Python\9.0"'
 $ps_profile_contents += 'set-alias npp "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents += 'set-alias notepad "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents = $ps_profile_contents | where { !(Select-String -SimpleMatch "${_}" -Path ${ps_profile} -Quiet)}

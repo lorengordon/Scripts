@@ -84,3 +84,6 @@ PROCESS {
 		}
 	}
 }
+END {
+"Completed processing all directories." | Out-Default
+}

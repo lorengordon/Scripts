@@ -75,6 +75,7 @@ PROCESS {
 			$exclude='\.png$'
 			"   Stripping first line from each file in the destination directory." | Out-Default
 			$new_files | where { $_.name -notmatch "$exclude" } | foreach {
+				# Courtesy http://www.computing.net/answers/programming/batch-to-detect-unix-and-windows-line-endings/24948.html
 				$unixEOF = (Get-Content $_ -Delimiter [String].Empty) -Match "[^`r]`n"
 				(Get-Content $_ | Select-Object -Skip 1) | Set-Content $_
 				if ($unixEOF) {

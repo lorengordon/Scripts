@@ -71,6 +71,7 @@ PROCESS {
 		$exclude='\.png\.txt$'
 		"   Pre-pending `'$prepend`' to each file in the destination directory." | Out-Default
 		$new_files | where { $_.name -notmatch "$exclude" } | foreach {
+			# Courtesy http://www.computing.net/answers/programming/batch-to-detect-unix-and-windows-line-endings/24948.html
 			$unixEOF = (Get-Content $_ -Delimiter [String].Empty) -Match "[^`r]`n"
 			$prepend,(Get-Content $_) | Set-Content $_
 			if ($unixEOF) {

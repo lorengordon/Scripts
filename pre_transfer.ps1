@@ -74,6 +74,7 @@ PROCESS {
 			$unixEOF = (Get-Content $_ -Delimiter [String].Empty) -Match "[^`r]`n"
 			$prepend,(Get-Content $_) | Set-Content $_
 			if ($unixEOF) {
+				# Courtesy http://stackoverflow.com/a/8852812
 				# get the contents and replace line breaks by U+000A
 				$contents = [IO.File]::ReadAllText($_) -replace "`r`n?", "`n"
 				# create UTF-8 encoding without signature

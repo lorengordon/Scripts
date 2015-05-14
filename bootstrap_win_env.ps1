@@ -25,7 +25,7 @@ Param(
     [string] $msysgit_url="https://github.com/msysgit/msysgit/releases/download/Git-1.9.5-preview20150319/Git-1.9.5-preview20150319.exe"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $posh-git_url = "https://github.com/dahlbyk/posh-git.git"
+    [string] $poshgit_url = "https://github.com/dahlbyk/posh-git.git"
 )
 
 
@@ -150,7 +150,7 @@ $ps_profile_contents,(Get-Content -Path $ps_profile) | Set-Content -Path ${ps_pr
 # Install posh-git
 Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 cd "${program_dir}"
-iex "git clone ${posh-git_url}"
+iex "git clone ${poshgit_url}"
 cd posh-git
 iex ".\install.ps1"
 

@@ -26,11 +26,10 @@ BEGIN {
 			[string[]] $Extension
 			,
 			[Parameter(Mandatory=$false,Position=1,ValueFromPipeLine=$false)]
-			[string] $DefaultType
+			[string] $DefaultType = $null
 		)
 		BEGIN
 		{
-			$mimeType = $null
 			$drive = Get-PSDrive HKCR -ErrorAction SilentlyContinue
 			if ( $null -eq $drive )
 			{
@@ -43,36 +42,76 @@ BEGIN {
 			{
 				if ( $null -ne $ext )
 				{
+					$mimeType = $null
 					try
 					{
 						$mimeType = (Get-ItemProperty HKCR:$ext -ErrorAction "Stop")."Content Type"
-						if ( $null -ne $mimeType ) 
-						{
-							return $mimeType 
-						}
-						elseif ( $DefaultType )
-						{
-							return $DefaultType 
-						}
 					}
 					catch
 					{
 						if ( "System.Management.Automation.ItemNotFoundException" -eq $_.Exception.GetType().FullName )
 						{
-							if ( $DefaultType )
-							{
-								return $DefaultType
-							}
-							else
-							{
-								continue
-							}
+							#noop
 						}
 						else
 						{
 							throw $_.Exception.GetType().FullName
 						}
 					}
+					if ( $null -ne $mimeType ) 
+					{
+						return $mimeType 
+					}
+					elseif ( $DefaultType )
+					{
+						return $DefaultType
+					}
+				}
+			}
+		}
+	}
+
+	function Get-DestFileName
+	{
+		[CmdLetBinding()]
+		Param(
+			[Parameter(Mandatory=$false,Position=0,ValueFromPipeLine=$true)]
+			[System.IO.FileInfo[]] $SourceFile
+			,
+			[Parameter(Mandatory=$false,Position=1,ValueFromPipeLine=$false)]
+			[System.IO.DirectoryInfo] $SourceDir
+			,
+			[Parameter(Mandatory=$false,Position=2,ValueFromPipeLine=$false)]
+			[string] $TargetDir
+		)
+		BEGIN
+		{
+			$DefaultType = "text/plain"
+			$MimeTypesToRename = @(
+				"text/plain"
+			)
+			# Make sure $sourcedir is a directory item
+			if ( ($SourceDir.gettype().name) -ne "DirectoryInfo" ) {
+				$SourceDir = Get-Item $SourceDir
+			}
+		}
+		PROCESS {
+			foreach ( $file in $SourceFile )
+			{
+				# Make sure the source file is a file item
+				if ( ($file.gettype().name) -ne "FileInfo" ) {
+					$file = Get-Item $file
+				}
+
+				$mime = Get-MimeType $file.Extension -DefaultType $DefaultType
+				$DestFileName = "${TargetDir}\$(${file}.FullName.Substring($SourceDir.FullName.length))"
+				if ( $MimeTypesToRename -contains $mime )
+				{
+					return "${DestFileName}.txt"
+				}
+				else
+				{
+					return "${DestFileName}"
 				}
 			}
 		}
@@ -125,7 +164,7 @@ PROCESS {
 		# Copy the files, tacking on a '.txt' extension
 		"   Copying files to the destination directory" | Out-Default
 		$new_files = $files | foreach {
-			Copy-Item -Path $_.FullName -Destination "${dest}\$(${_}.FullName.Substring($s_dir.FullName.length)).txt" -Force -PassThru
+			Copy-Item -Path $_.FullName -Destination (Get-DestFileName $_ $s_dir $dest) -Force -PassThru
 		}
 
 		# Add the $prepend string to each file

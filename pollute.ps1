@@ -88,21 +88,23 @@ PROCESS {
 		}
 
 		# Add the $prepend_text string to each file
-		"   Pre-pending `'$prepend_text`' to each file in the destination directory." | Out-Default
-		$new_files | where { $prepend_whitelist -notcontains $_.Extension } | foreach {
-			# Courtesy http://stackoverflow.com/a/8852812
-			# Get the contents
-			$contents = [IO.File]::ReadAllText($_)
-			# Check for unix line endings
-			# Courtesy http://www.computing.net/answers/programming/batch-to-detect-unix-and-windows-line-endings/24948.html
-			$EOL = "`r`n"
-			if ( $contents -Match "[^`r]`n" )	{ $EOL = "`n" }
-			# Prepend $prepend_text to $contents
-			$contents = $prepend_text + $EOL + $contents
-			# Create UTF-8 encoding without signature
-			$utf8 = New-Object System.Text.UTF8Encoding $false
-			# Write the text back
-			[IO.File]::WriteAllText($_, $contents, $utf8)
+		if ( $prepend_text ) {
+			"   Pre-pending `'$prepend_text`' to each file in the destination directory." | Out-Default
+			$new_files | where { $prepend_whitelist -notcontains $_.Extension } | foreach {
+				# Courtesy http://stackoverflow.com/a/8852812
+				# Get the contents
+				$contents = [IO.File]::ReadAllText($_)
+				# Check for unix line endings
+				# Courtesy http://www.computing.net/answers/programming/batch-to-detect-unix-and-windows-line-endings/24948.html
+				$EOL = "`r`n"
+				if ( $contents -Match "[^`r]`n" )	{ $EOL = "`n" }
+				# Prepend $prepend_text to $contents
+				$contents = $prepend_text + $EOL + $contents
+				# Create UTF-8 encoding without signature
+				$utf8 = New-Object System.Text.UTF8Encoding $false
+				# Write the text back
+				[IO.File]::WriteAllText($_, $contents, $utf8)
+			}
 		}
 	}
 }

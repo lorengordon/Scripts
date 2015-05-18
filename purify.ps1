@@ -64,10 +64,11 @@ PROCESS {
 		# Create array of all files that are not in the .git directory
 		$files = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch "\.git$|\.git\\"} | where { $_.PSIsContainer -eq $false })
 
-		# Copy the files, tacking on a '.txt' extension
+		# Copy the files, removing the $strip_extension extension
 		"   Copying files to the destination directory" | Out-Default
 		$new_files = $files | foreach {
-			Copy-Item -Path $_.FullName -Destination "${dest}\$($(${_}.FullName.Substring($s_dir.FullName.length)).TrimEnd($strip_extension))" -Force -PassThru
+			$DestFileName = "${dest}\$($(${_}.FullName.Substring($s_dir.FullName.length)).TrimEnd($strip_extension))"
+			Copy-Item -Path $_.FullName -Destination $DestFileName -Force -PassThru
 		}
 
 		# Strip the first line from each file

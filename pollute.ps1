@@ -8,114 +8,29 @@ Param(
     [System.IO.DirectoryInfo] $dest_root
     ,
     [Parameter(Mandatory=$false)]
-    [string] $prepend="### MANAGED FILE ###"
+    [string] $prepend_text="### MANAGED FILE ###"
+    ,
+    [Parameter(Mandatory=$false)]
+    [string[]] $prepend_whitelist=@(
+		".png"
+	)
+    ,
+    [Parameter(Mandatory=$false)]
+    [string] $rename_ext=".txt"
+    ,
+    [Parameter(Mandatory=$false)]
+    [string[]] $rename_whitelist=@(
+		".png"
+	)
     ,
     [Parameter(Mandatory=$false)]
     [switch] $force
 )
 BEGIN {
+
 	#Make sure $dest_root exists and is a directory item
 	$dest_root = New-Item -Path $dest_root -ItemType Directory -Force
 
-	function Get-MimeType 
-	{
-		#Courtesy http://stackoverflow.com/a/13053795
-		[CmdLetBinding()]
-		Param(
-			[Parameter(Mandatory=$false,Position=0,ValueFromPipeLine=$true)]
-			[string[]] $Extension
-			,
-			[Parameter(Mandatory=$false,Position=1,ValueFromPipeLine=$false)]
-			[string] $DefaultType = $null
-		)
-		BEGIN
-		{
-			$drive = Get-PSDrive HKCR -ErrorAction SilentlyContinue
-			if ( $null -eq $drive )
-			{
-			  $drive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
-			}
-		}
-		PROCESS
-		{
-			foreach ( $ext in $extension ) 
-			{
-				if ( $null -ne $ext )
-				{
-					$mimeType = $null
-					try
-					{
-						$mimeType = (Get-ItemProperty HKCR:$ext -ErrorAction "Stop")."Content Type"
-					}
-					catch
-					{
-						if ( "System.Management.Automation.ItemNotFoundException" -eq $_.Exception.GetType().FullName )
-						{
-							#noop
-						}
-						else
-						{
-							throw $_.Exception.GetType().FullName
-						}
-					}
-					if ( $null -ne $mimeType ) 
-					{
-						return $mimeType 
-					}
-					elseif ( $DefaultType )
-					{
-						return $DefaultType
-					}
-				}
-			}
-		}
-	}
-
-	function Get-DestFileName
-	{
-		[CmdLetBinding()]
-		Param(
-			[Parameter(Mandatory=$false,Position=0,ValueFromPipeLine=$true)]
-			[System.IO.FileInfo[]] $SourceFile
-			,
-			[Parameter(Mandatory=$false,Position=1,ValueFromPipeLine=$false)]
-			[System.IO.DirectoryInfo] $SourceDir
-			,
-			[Parameter(Mandatory=$false,Position=2,ValueFromPipeLine=$false)]
-			[string] $TargetDir
-		)
-		BEGIN
-		{
-			$DefaultType = "text/plain"
-			$MimeTypesToRename = @(
-				"text/plain"
-			)
-			# Make sure $sourcedir is a directory item
-			if ( ($SourceDir.gettype().name) -ne "DirectoryInfo" ) {
-				$SourceDir = Get-Item $SourceDir
-			}
-		}
-		PROCESS {
-			foreach ( $file in $SourceFile )
-			{
-				# Make sure the source file is a file item
-				if ( ($file.gettype().name) -ne "FileInfo" ) {
-					$file = Get-Item $file
-				}
-
-				$mime = Get-MimeType $file.Extension -DefaultType $DefaultType
-				$DestFileName = "${TargetDir}\$(${file}.FullName.Substring($SourceDir.FullName.length))"
-				if ( $MimeTypesToRename -contains $mime )
-				{
-					return "${DestFileName}.txt"
-				}
-				else
-				{
-					return "${DestFileName}"
-				}
-			}
-		}
-	}
 }
 PROCESS {
 	foreach ($s_dir in $source) {
@@ -159,30 +74,35 @@ PROCESS {
 		}
 
 		# Create array of all files that are not in the .git directory
+		"   Getting a list of all the files to process" | Out-Default
 		$files = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch "\.git$|\.git\\"} | where { $_.PSIsContainer -eq $false })
 
-		# Copy the files, tacking on a '.txt' extension
+		# Copy the files, tacking on a '.txt' extension if the file extension isn't whitelisted
 		"   Copying files to the destination directory" | Out-Default
 		$new_files = $files | foreach {
-			Copy-Item -Path $_.FullName -Destination (Get-DestFileName $_ $s_dir $dest) -Force -PassThru
+			$DestFileName = "${dest}\$($_.FullName.Substring($s_dir.FullName.length))"
+			if ( $rename_whitelist -notcontains $_.Extension ) {
+				$DestFileName = $DestFileName + $rename_ext
+			}
+			Copy-Item -Path "$($_.FullName)" -Destination "$DestFileName" -Force -PassThru
 		}
 
-		# Add the $prepend string to each file
-		$exclude='\.png\.txt$'
-		"   Pre-pending `'$prepend`' to each file in the destination directory." | Out-Default
-		$new_files | where { $_.name -notmatch "$exclude" } | foreach {
+		# Add the $prepend_text string to each file
+		"   Pre-pending `'$prepend_text`' to each file in the destination directory." | Out-Default
+		$new_files | where { $prepend_whitelist -notcontains $_.Extension } | foreach {
+			# Courtesy http://stackoverflow.com/a/8852812
+			# Get the contents
+			$contents = [IO.File]::ReadAllText($_)
+			# Check for unix line endings
 			# Courtesy http://www.computing.net/answers/programming/batch-to-detect-unix-and-windows-line-endings/24948.html
-			$unixEOF = (Get-Content $_ -Delimiter [String].Empty) -Match "[^`r]`n"
-			$prepend,(Get-Content $_) | Set-Content $_
-			if ($unixEOF) {
-				# Courtesy http://stackoverflow.com/a/8852812
-				# get the contents and replace line breaks by U+000A
-				$contents = [IO.File]::ReadAllText($_) -replace "`r`n?", "`n"
-				# create UTF-8 encoding without signature
-				$utf8 = New-Object System.Text.UTF8Encoding $false
-				# write the text back
-				[IO.File]::WriteAllText($_, $contents, $utf8)
-			}
+			$EOL = "`r`n"
+			if ( $contents -Match "[^`r]`n" )	{ $EOL = "`n" }
+			# Prepend $prepend_text to $contents
+			$contents = $prepend_text + $EOL + $contents
+			# Create UTF-8 encoding without signature
+			$utf8 = New-Object System.Text.UTF8Encoding $false
+			# Write the text back
+			[IO.File]::WriteAllText($_, $contents, $utf8)
 		}
 	}
 }

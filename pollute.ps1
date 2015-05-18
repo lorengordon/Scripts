@@ -16,6 +16,67 @@ Param(
 BEGIN {
 	#Make sure $dest_root exists and is a directory item
 	$dest_root = New-Item -Path $dest_root -ItemType Directory -Force
+
+	function Get-MimeType 
+	{
+		#Courtesy http://stackoverflow.com/a/13053795
+		[CmdLetBinding()]
+		Param(
+			[Parameter(Mandatory=$false,Position=0,ValueFromPipeLine=$true)]
+			[string[]] $Extension
+			,
+			[Parameter(Mandatory=$false,Position=1,ValueFromPipeLine=$false)]
+			[string] $DefaultType
+		)
+		BEGIN
+		{
+			$mimeType = $null
+			$drive = Get-PSDrive HKCR -ErrorAction SilentlyContinue
+			if ( $null -eq $drive )
+			{
+			  $drive = New-PSDrive -Name HKCR -PSProvider Registry -Root HKEY_CLASSES_ROOT
+			}
+		}
+		PROCESS
+		{
+			foreach ( $ext in $extension ) 
+			{
+				if ( $null -ne $ext )
+				{
+					try
+					{
+						$mimeType = (Get-ItemProperty HKCR:$ext -ErrorAction "Stop")."Content Type"
+						if ( $null -ne $mimeType ) 
+						{
+							return $mimeType 
+						}
+						elseif ( $DefaultType )
+						{
+							return $DefaultType 
+						}
+					}
+					catch
+					{
+						if ( "System.Management.Automation.ItemNotFoundException" -eq $_.Exception.GetType().FullName )
+						{
+							if ( $DefaultType )
+							{
+								return $DefaultType
+							}
+							else
+							{
+								continue
+							}
+						}
+						else
+						{
+							throw $_.Exception.GetType().FullName
+						}
+					}
+				}
+			}
+		}
+	}
 }
 PROCESS {
 	foreach ($s_dir in $source) {

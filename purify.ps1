@@ -14,6 +14,11 @@ Param(
     [bool] $strip_firstline=$true
     ,
     [Parameter(Mandatory=$false)]
+    [string[]] $strip_firstline_whitelist=@(
+		".png"
+	)
+    ,
+    [Parameter(Mandatory=$false)]
     [switch] $force
 )
 BEGIN {
@@ -67,27 +72,30 @@ PROCESS {
 		# Copy the files, removing the $strip_extension extension
 		"   Copying files to the destination directory" | Out-Default
 		$new_files = $files | foreach {
-			$DestFileName = "${dest}\$($(${_}.FullName.Substring($s_dir.FullName.length)).TrimEnd($strip_extension))"
+			$DestFileName = "${dest}\$(${_}.FullName.Substring($s_dir.FullName.length))"
+			if ( $DestFileName.ToLower().EndsWith($strip_extension) ) {
+				$DestFileName = $DestFileName.Substring(0,$DestFileName.Length-$strip_extension.Length)
+			}
 			Copy-Item -Path $_.FullName -Destination $DestFileName -Force -PassThru
 		}
 
 		# Strip the first line from each file
 		if ($strip_firstline) {
-			$exclude='\.png$'
 			"   Stripping first line from each file in the destination directory." | Out-Default
-			$new_files | where { $_.name -notmatch "$exclude" } | foreach {
+			$new_files | where { $strip_firstline_whitelist -notcontains $_.Extension } | foreach {
+				# Courtesy http://stackoverflow.com/a/8852812
+				# Get the contents as a string
+				$contents = [IO.File]::ReadAllText($_)
+				# Check for unix line endings
 				# Courtesy http://www.computing.net/answers/programming/batch-to-detect-unix-and-windows-line-endings/24948.html
-				$unixEOF = (Get-Content $_ -Delimiter [String].Empty) -Match "[^`r]`n"
-				(Get-Content $_ | Select-Object -Skip 1) | Set-Content $_
-				if ($unixEOF) {
-					# Courtesy http://stackoverflow.com/a/8852812
-					# get the contents and replace line breaks by U+000A
-					$contents = [IO.File]::ReadAllText($_) -replace "`r`n?", "`n"
-					# create UTF-8 encoding without signature
-					$utf8 = New-Object System.Text.UTF8Encoding $false
-					# write the text back
-					[IO.File]::WriteAllText($_, $contents, $utf8)
-				}
+				$EOL = "`r`n"
+				if ( $contents -Match "[^`r]`n" )	{ $EOL = "`n" }
+				# Strip the first line
+				$contents = $contents -replace "^.*$EOL", ""
+				# Create UTF-8 encoding without signature
+				$utf8 = New-Object System.Text.UTF8Encoding $false
+				# Write the text back
+				[IO.File]::WriteAllText($_, $contents, $utf8)
 			}
 		}
 	}

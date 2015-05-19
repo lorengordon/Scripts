@@ -79,6 +79,29 @@ $shell.namespace($npp_dir).copyhere($shell.namespace("$npp_zipfile").items(), 0x
 #TODO: Use ftypes and assoc to build the list of text file types automatically
 #$notepad_ftypes = cmd /c ftype | where { $_ -match "notepad"} | % {$_.split('=')[0] }
 
+
+# List of python file types to be handled by python
+$python_ftypes = @(
+	".py"
+)
+
+
+# Add handler for python27
+"Adding handler for python27 to the registry" | Out-Default
+iex @'
+reg add `"HKCU\Software\Classes\Applications\python.exe\shell\open\command`" /ve /t REG_SZ /d `"\`"${python27_dir}\python.exe\`" \`"%1\`" %*`" /f
+'@
+
+
+# Make python27 the default for all python file types
+$python_ftypes | % {
+	"Making python27 the default handler for file type: $_" | Out-Default
+	iex @'
+reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\UserChoice`" /v `"Progid`" /t REG_SZ /d `"Applications\python.exe`" /f
+'@
+}
+
+
 # List of text file types handled by notepad by default
 $text_ftypes = @(
 	".compositefont", ".css", ".dic", ".exc", ".gitattributes", ".gitignore"
@@ -88,7 +111,7 @@ $text_ftypes = @(
 
 
 # Add handler for npp
-"Adding handler for notepad++ to the registry"
+"Adding handler for notepad++ to the registry" | Out-Default
 iex @'
 reg add `"HKCU\Software\Classes\Applications\notepad++.exe\shell\open\command`" /ve /t REG_SZ /d `"\`"${npp_dir}\notepad++.exe\`" \`"%1\`"`" /f
 '@

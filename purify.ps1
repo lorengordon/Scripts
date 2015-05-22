@@ -16,6 +16,7 @@ Param(
     [Parameter(Mandatory=$false)]
     [string[]] $strip_firstline_whitelist=@(
 		".png"
+        ".jpg"
 	)
     ,
     [Parameter(Mandatory=$false)]

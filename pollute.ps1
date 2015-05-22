@@ -13,6 +13,7 @@ Param(
     [Parameter(Mandatory=$false)]
     [string[]] $prepend_whitelist=@(
 		".png"
+        ".jpg"
 	)
     ,
     [Parameter(Mandatory=$false)]
@@ -21,6 +22,7 @@ Param(
     [Parameter(Mandatory=$false)]
     [string[]] $rename_whitelist=@(
 		".png"
+        ".jpg"
 	)
     ,
     [Parameter(Mandatory=$false)]
@@ -65,7 +67,8 @@ PROCESS {
 		$dest = New-Item -Path $dest -ItemType Directory -Force
 
 		# Create array of all subdirectories in the source excluding .git
-		$dirs = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch "\.git$"} | where { $_.PSIsContainer -eq $true })
+        $exclude_dirs = "\.git$"
+		$dirs = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch $exclude_dirs } | where { $_.PSIsContainer -eq $true })
 
 		# Create the directory tree
 		"   Replicating the directory tree of the source in the destination directory." | Out-Default
@@ -73,9 +76,10 @@ PROCESS {
 			New-Item -Path "${dest}\$(${_}.FullName.Substring($s_dir.FullName.length))" -ItemType "Directory" -Force
 		}
 
-		# Create array of all files that are not in the .git directory
+		# Create array of all files that don't match the $exclude_files string
 		"   Getting a list of all the files to process" | Out-Default
-		$files = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch "\.git$|\.git\\"} | where { $_.PSIsContainer -eq $false })
+        $exclude_files = "\.git\\|Thumbs\.db|\.zip$"
+		$files = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch $exclude_files } | where { $_.PSIsContainer -eq $false })
 
 		# Copy the files, tacking on a '.txt' extension if the file extension isn't whitelisted
 		"   Copying files to the destination directory" | Out-Default

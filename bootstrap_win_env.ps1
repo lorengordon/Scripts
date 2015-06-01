@@ -143,8 +143,8 @@ Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -No
 # Setup basic git settings
 "Configuring basic git settings" | Out-Default
 $env:path += ";${msysgit_dir}\cmd;${msysgit_dir}\bin"
-iex "git config --global user.name ${git_username}"
-iex "git config --global user.email ${git_email}"
+iex "git config --global user.name `"${git_username}`""
+iex "git config --global user.email `"${git_email}`""
 iex "git config --global core.autocrlf false"
 iex "git config --global branch.autosetuprebase always"
 iex "git config --global credential.helper wincred"

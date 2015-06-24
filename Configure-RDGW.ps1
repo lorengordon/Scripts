@@ -1,5 +1,6 @@
-﻿param(
-    $ServerFQDN = $Env:COMPUTERNAME,
+﻿[CmdLetBinding()]
+Param(
+    $ServerFQDN = $env:computername,
     $DomainNetBiosName = "BUILTIN",
     $GroupName = "Administrators"
     )
@@ -43,16 +44,24 @@ $enrollment.InitializeFromRequest($cert)
 $certdata = $enrollment.CreateRequest(0)
 $enrollment.InstallResponse(2, $certdata, 0, "")
 
-dir cert:\localmachine\my | ? { $_.Subject -eq "CN=$ServerFQDN" } | % { [system.IO.file]::WriteAllBytes("C:\$ServerFQDN.cer", ($_.Export('CERT', 'secret')) ) }
+dir cert:\localmachine\my | ? { $_.Subject -eq "CN=$ServerFQDN" } | % { [system.IO.file]::WriteAllBytes("c:\$ServerFQDN.cer", ($_.Export('CERT', 'secret')) ) }
 
-& "certutil" -addstore "Root" C:\$ServerFQDN.cer
+& "certutil" -addstore "Root" C:\WIN-0R2CFDG157N.cer
+
+if (test-path RDS:\GatewayServer\CAP\Default-CAP) {
+  remove-item -path RDS:\GatewayServer\CAP\Default-CAP -Recurse
+}
 
 new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "$GroupName@$DomainNetBiosName" -AuthMethod 1
+
+if (test-path RDS:\GatewayServer\RAP\Default-RAP) {
+  remove-item -Path RDS:\GatewayServer\RAP\Default-RAP -Recurse
+}
 
 new-item -Path RDS:\GatewayServer\RAP -Name Default-RAP -UserGroups "$GroupName@$DomainNetBiosName" -ComputerGroupType 2
 
 set-item -Path RDS:\GatewayServer\SSLBridging 1
 
-dir cert:\localmachine\my | where-object { $_.Subject -eq "CN=$ServerFQDN" } | ForEach-Object { Set-Item -Path RDS:\GatewayServer\SSLCertificate\Thumbprint -Value $_.Thumbprint }
+Set-Item -Path RDS:\GatewayServer\SSLCertificate\Thumbprint -Value $((New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("c:\$ServerFQDN.cer")).Thumbprint)
 
 Restart-Service tsgateway

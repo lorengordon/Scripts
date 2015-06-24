@@ -46,7 +46,7 @@ $enrollment.InstallResponse(2, $certdata, 0, "")
 
 dir cert:\localmachine\my | ? { $_.Subject -eq "CN=$ServerFQDN" } | % { [system.IO.file]::WriteAllBytes("c:\$ServerFQDN.cer", ($_.Export('CERT', 'secret')) ) }
 
-& "certutil" -addstore "Root" C:\WIN-0R2CFDG157N.cer
+& "certutil" -addstore "Root" "C:\$ServerFQDN.cer"
 
 if (test-path RDS:\GatewayServer\CAP\Default-CAP) {
   remove-item -path RDS:\GatewayServer\CAP\Default-CAP -Recurse

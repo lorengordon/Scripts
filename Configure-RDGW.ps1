@@ -11,6 +11,12 @@ Param(
 Install-WindowsFeature RDS-Gateway,RSAT-RDS-Gateway
 Import-Module remotedesktopservices
 
+# Remove self-signed certs from the personal store before creating a new one
+dir cert:\localmachine\my | ? { $_.Issuer -eq $_.Subject } | % { Remove-Item  $_.PSPath }
+
+# Remove root certs where the subject matches the ServerFQDN
+dir cert:\localmachine\root | ? { $_.Subject -eq "CN=$ServerFQDN" } | % { Remove-Item  $_.PSPath }
+
 $name = new-object -com "X509Enrollment.CX500DistinguishedName.1"
 $name.Encode("CN=$ServerFQDN", 0)
 

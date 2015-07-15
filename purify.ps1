@@ -20,11 +20,55 @@ Param(
 	)
     ,
     [Parameter(Mandatory=$false)]
+    [string[]] $decode_types=@(
+		".exe"
+        ".rpm"
+        ".msi"
+        ".pdf"
+        ".zip"
+        ".class"
+        ".jar"
+        ".eps"
+        ".tar"
+        ".gz"
+	)
+    ,
+    [Parameter(Mandatory=$false)]
     [switch] $force
 )
 BEGIN {
+
+
+    function Convert-StringToBinary {
+        [CmdletBinding()]
+        param (
+            [Parameter(Mandatory=$true,Position=0,ValueFromPipeLine=$true)]
+            [string] $InputString
+            ,
+            [Parameter(Mandatory=$false)]
+            [string] $FilePath = ('{0}\{1}' -f $env:TEMP, [System.Guid]::NewGuid().ToString())
+        )
+
+        try 
+        {
+            if ($InputString.Length -ge 1) 
+            {
+                $ByteArray = [System.Convert]::FromBase64String($InputString);
+                [System.IO.File]::WriteAllBytes("${FilePath}", $ByteArray);
+            }
+        }
+        catch 
+        {
+            throw ('Failed to create file from Base64 string: {0}' -f $FilePath);
+        }
+
+        Write-Output -InputObject (Get-Item -Path "${FilePath}");
+    }
+
+
 	#Make sure $dest_root exists and is a directory item
 	$dest_root = New-Item -Path $dest_root -ItemType Directory -Force
+
 }
 PROCESS {
 	foreach ($s_dir in $source) {
@@ -99,6 +143,12 @@ PROCESS {
 				[IO.File]::WriteAllText($_, $contents, $utf8)
 			}
 		}
+        
+        # Decode base64 content for files with extensions that match $decode_types
+        "   Decoding base64-encoded files..."
+        $null = $new_files | where { $decode_types -contains $_.Extension } | foreach {
+            (Get-Content $_.FullName) | Convert-StringToBinary -FilePath $_.FullName
+        }
 	}
 }
 END {

@@ -26,12 +26,56 @@ Param(
 	)
     ,
     [Parameter(Mandatory=$false)]
+    [string[]] $encode_types=@(
+		".exe"
+        ".rpm"
+        ".msi"
+        ".pdf"
+        ".zip"
+        ".class"
+        ".jar"
+        ".eps"
+        ".tar"
+        ".gz"
+	)
+    ,
+    [Parameter(Mandatory=$false)]
     [string] $exclude_regex="\.git\\|Thumbs\.db|\.zip$"
     ,
     [Parameter(Mandatory=$false)]
     [switch] $force
 )
 BEGIN {
+
+
+    # Define helper functions
+    function Convert-BinaryToString {
+        [CmdletBinding()]
+        param (
+            [string] $FilePath
+        )
+
+        try 
+        {
+            $ByteArray = [System.IO.File]::ReadAllBytes($FilePath);
+        }
+        catch 
+        {
+            throw "Failed to read file. Please ensure that you have permission to the file, and that the file path is correct.";
+        }
+
+        if ($ByteArray) 
+        {
+            $Base64String = [System.Convert]::ToBase64String($ByteArray);
+        }
+        else 
+        {
+            throw '$ByteArray is $null.';
+        }
+
+        Write-Output -InputObject $Base64String;
+    }
+
 
 	#Make sure $dest_root exists and is a directory item
 	$dest_root = New-Item -Path $dest_root -ItemType Directory -Force
@@ -90,7 +134,13 @@ PROCESS {
 			if ( $rename_whitelist -notcontains $_.Extension ) {
 				$DestFileName = $DestFileName + $rename_ext
 			}
-			Copy-Item -Path "$($_.FullName)" -Destination "$DestFileName" -Force -PassThru
+            # Base64 encode files with extensions that match $encode_types; straight copy everything else
+            if ( $encode_types -contains $_.Extension ) {
+                Convert-BinaryToString -FilePath $_.FullName | Out-File -FilePath $DestFileName
+            } else {
+                Copy-Item -Path "$($_.FullName)" -Destination "$DestFileName" -Force
+            }
+            Get-Item "$DestFileName"
 		}
 
 		# Add the $prepend_text string to each file

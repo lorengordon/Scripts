@@ -146,7 +146,7 @@ PROCESS {
         
         # Decode base64 content for files with extensions that match $decode_types
         "   Decoding base64-encoded files..."
-        $null = $new_files | where { $decode_types -contains $_.Extension } | foreach {
+        $null = $new_files | where { $decode_types -contains $_.Extension -or $_.Extension -match "[0-9]{3}" } | foreach {
             (Get-Content $_.FullName) | Convert-StringToBinary -FilePath $_.FullName
         }
 	}

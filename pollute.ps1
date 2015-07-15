@@ -135,7 +135,7 @@ PROCESS {
 				$DestFileName = $DestFileName + $rename_ext
 			}
             # Base64 encode files with extensions that match $encode_types; straight copy everything else
-            if ( $encode_types -contains $_.Extension ) {
+            if ( $encode_types -contains $_.Extension -or $_.Extension -match "[0-9]{3}" ) {
                 Convert-BinaryToString -FilePath $_.FullName | Out-File -FilePath $DestFileName
             } else {
                 Copy-Item -Path "$($_.FullName)" -Destination "$DestFileName" -Force

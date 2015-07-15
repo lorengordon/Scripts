@@ -26,6 +26,9 @@ Param(
 	)
     ,
     [Parameter(Mandatory=$false)]
+    [string] $exclude_regex="\.git\\|Thumbs\.db|\.zip$"
+    ,
+    [Parameter(Mandatory=$false)]
     [switch] $force
 )
 BEGIN {
@@ -76,10 +79,9 @@ PROCESS {
 			New-Item -Path "${dest}\$(${_}.FullName.Substring($s_dir.FullName.length))" -ItemType "Directory" -Force
 		}
 
-		# Create array of all files that don't match the $exclude_files string
+		# Create array of all files that don't match the $exclude_regex string
 		"   Getting a list of all the files to process" | Out-Default
-        $exclude_files = "\.git\\|Thumbs\.db|\.zip$"
-		$files = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch $exclude_files } | where { $_.PSIsContainer -eq $false })
+		$files = @(Get-ChildItem -Path $s_dir -Recurse | where { $_.FullName -notmatch $exclude_regex } | where { $_.PSIsContainer -eq $false })
 
 		# Copy the files, tacking on a '.txt' extension if the file extension isn't whitelisted
 		"   Copying files to the destination directory" | Out-Default

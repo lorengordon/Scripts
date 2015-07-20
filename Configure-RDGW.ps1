@@ -8,8 +8,8 @@ Param(
 #Based on:
 # * https://s3.amazonaws.com/microsoft_windows/scripts/Configure-RDGW.ps1
 
-Install-WindowsFeature RDS-Gateway,RSAT-RDS-Gateway
-Import-Module remotedesktopservices
+$null = Install-WindowsFeature RDS-Gateway,RSAT-RDS-Gateway
+$null = Import-Module remotedesktopservices
 
 # Remove self-signed certs from the personal store before creating a new one
 dir cert:\localmachine\my | ? { $_.Issuer -eq $_.Subject } | % { Remove-Item  $_.PSPath }
@@ -58,16 +58,16 @@ if (test-path RDS:\GatewayServer\CAP\Default-CAP) {
   remove-item -path RDS:\GatewayServer\CAP\Default-CAP -Recurse
 }
 
-new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "$GroupName@$DomainNetBiosName" -AuthMethod 1
+$null = new-item -path RDS:\GatewayServer\CAP -Name Default-CAP -UserGroups "$GroupName@$DomainNetBiosName" -AuthMethod 1
 
 if (test-path RDS:\GatewayServer\RAP\Default-RAP) {
   remove-item -Path RDS:\GatewayServer\RAP\Default-RAP -Recurse
 }
 
-new-item -Path RDS:\GatewayServer\RAP -Name Default-RAP -UserGroups "$GroupName@$DomainNetBiosName" -ComputerGroupType 2
+$null = new-item -Path RDS:\GatewayServer\RAP -Name Default-RAP -UserGroups "$GroupName@$DomainNetBiosName" -ComputerGroupType 2
 
-set-item -Path RDS:\GatewayServer\SSLBridging 1
+$null = set-item -Path RDS:\GatewayServer\SSLBridging 1
 
-Set-Item -Path RDS:\GatewayServer\SSLCertificate\Thumbprint -Value $((New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("c:\$ServerFQDN.cer")).Thumbprint)
+$null = Set-Item -Path RDS:\GatewayServer\SSLCertificate\Thumbprint -Value $((New-Object System.Security.Cryptography.X509Certificates.X509Certificate2("c:\$ServerFQDN.cer")).Thumbprint)
 
 Restart-Service tsgateway

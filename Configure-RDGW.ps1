@@ -1,12 +1,20 @@
 ﻿[CmdLetBinding()]
 Param(
-    $ServerFQDN = $env:computername,
+    $ServerFQDN,
     $DomainNetBiosName = "BUILTIN",
     $GroupName = "Administrators"
     )
 
 #Based on:
 # * https://s3.amazonaws.com/microsoft_windows/scripts/Configure-RDGW.ps1
+
+if (-not $ServerFQDN) {
+    $name = invoke-restmethod -uri http://169.254.169.254/latest/meta-data/public-hostname
+    if (-not $name) {
+        $name = [System.Net.DNS]::GetHostByName('').HostName
+    }
+    $ServerFQDN = $name
+}
 
 $null = Install-WindowsFeature RDS-Gateway,RSAT-RDS-Gateway
 $null = Import-Module remotedesktopservices

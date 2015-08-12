@@ -31,6 +31,7 @@ Param(
         ".eps"
         ".tar"
         ".gz"
+        ".mpp"
 	)
     ,
     [Parameter(Mandatory=$false)]

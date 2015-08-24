@@ -22,7 +22,7 @@ Param(
     [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.8.2/npp.6.8.2.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $msysgit_url="https://github.com/msysgit/msysgit/releases/download/Git-1.9.5-preview20150319/Git-1.9.5-preview20150319.exe"
+    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.5.0.windows.1/Git-2.5.0-64-bit.exe"
     ,
     [Parameter(Mandatory=$false)]
     [string] $poshgit_url = "https://github.com/dahlbyk/posh-git.git"
@@ -175,8 +175,8 @@ $ps_profile = "${ps_profile_dir}\Microsoft.PowerShell_profile.ps1"
 New-Item -Path $ps_profile_dir -ItemType Directory -Force
 New-Item -Path $ps_profile -ItemType File -ErrorAction SilentlyContinue
 $ps_profile_contents = @()
-$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\cmd"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\bin"'
+$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\usr\bin"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27\Scripts"'
 $ps_profile_contents += '$env:path += ";${env:localappdata}\Programs\Common\Microsoft\Visual C++ for Python\9.0"'
@@ -196,5 +196,4 @@ iex ".\install.ps1"
 
 
 # Load ps profile
-"Loading the PowerShell profile" | Out-Default
-. $PROFILE
+'Bootstrap complete. Run ". $PROFILE" to load the PowerShell profile' | Out-Default

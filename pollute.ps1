@@ -41,7 +41,7 @@ Param(
 	)
     ,
     [Parameter(Mandatory=$false)]
-    [string] $exclude_regex="\.git\\|Thumbs\.db|\.zip$"
+    [string] $exclude_regex="\.git\\|Thumbs\.db$"
     ,
     [Parameter(Mandatory=$false)]
     [switch] $force

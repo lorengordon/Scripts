@@ -22,7 +22,7 @@ Param(
     [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.8.6/npp.6.8.6.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.6.2.windows.1/Git-2.6.2-64-bit.exe"
+    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.6.2.windows.1/PortableGit-2.6.2-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
     [string] $poshgit_url = "https://github.com/dahlbyk/posh-git.git"
@@ -133,10 +133,13 @@ $msysgit_installer = "${download_dir}\msysgit.exe"
 
 
 # Install msysgit
+"Stopping ssh-agent..." | Out-Default
+stop-process -Name ssh-agent -ErrorAction silentlycontinue
+
 "Installing msysgit" | Out-Default
 $msysgit_dir = "${program_dir}\Git"
 New-Item -Path $msysgit_dir -ItemType Directory -Force
-$msysgit_params = "/SP- /VERYSILENT /SUPPRESSMSGBOXES /NOCLOSEAPPLICATIONS /NORESTART /DIR=`"${msysgit_dir}`" /COMPONENTS=`"icons,icons\quicklaunch,icons\desktop,ext,ext\cheetah,assoc,assoc_sh`""
+$msysgit_params = "-y -gm2 -InstallPath=`"${msysgit_dir}`""
 Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -NoNewWindow -PassThru -Wait
 
 

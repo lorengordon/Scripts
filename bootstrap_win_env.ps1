@@ -30,48 +30,48 @@ Param(
 
 
 # Create user dirs
-"Creating download and program directories" | Out-Default
-New-Item -Path $download_dir -ItemType Directory -Force
-New-Item -Path $program_dir -ItemType Directory -Force
+"Creating download and program directories..." | Out-Default
+$null = New-Item -Path $download_dir -ItemType Directory -Force
+$null = New-Item -Path $program_dir -ItemType Directory -Force
 
 
 # Get python27 installer
-"Downloading python27" | Out-Default
+"Downloading python27..." | Out-Default
 $python27_installer = "${download_dir}\python27.msi"
 (new-object net.webclient).DownloadFile("${python27_url}","${python27_installer}")
 
 
 # Install python27
 $python27_dir = "${program_dir}\Python27"
-"Creating python27 directory" | Out-Default
-New-Item -Path $python27_dir -ItemType Directory -Force
-"Installing python27" | Out-Default
+"Creating python27 directory..." | Out-Default
+$null = New-Item -Path $python27_dir -ItemType Directory -Force
+"Installing python27..." | Out-Default
 $python27_params = "/i `"${python27_installer}`" /quiet /qn /norestart TARGETDIR=`"${python27_dir}`" ADDLOCAL=ALL"
-Start-Process -FilePath msiexec -ArgumentList ${python27_params} -NoNewWindow -PassThru -Wait
+$null = Start-Process -FilePath msiexec -ArgumentList ${python27_params} -NoNewWindow -PassThru -Wait
 
 
 # Get vc_python27 installer
-"Downloading vc python27 compiler" | Out-Default
+"Downloading vc python27 compiler..." | Out-Default
 $vc_python27_installer = "${download_dir}\vc_python27.msi"
 (new-object net.webclient).DownloadFile("${vc_python27_url}","${vc_python27_installer}")
 
 
 # Install python
-"Installing vc python27 compiler" | Out-Default
+"Installing vc python27 compiler..." | Out-Default
 $vc_python27_params = "/i `"${vc_python27_installer}`" /quiet /qn /norestart"
-Start-Process -FilePath msiexec -ArgumentList ${vc_python27_params} -NoNewWindow -PassThru -Wait
+$null = Start-Process -FilePath msiexec -ArgumentList ${vc_python27_params} -NoNewWindow -PassThru -Wait
 
 
 # Get npp zip file
-"Downloading notepad++" | Out-Default
+"Downloading notepad++..." | Out-Default
 $npp_zipfile = "${download_dir}\npp.zip"
 (new-object net.webclient).DownloadFile("${npp_url}","${npp_zipfile}")
 
 
 # Unzip npp
-"Installing notepad++" | Out-Default
+"Installing notepad++..." | Out-Default
 $npp_dir = "${program_dir}\npp"
-New-Item -Path $npp_dir -ItemType Directory -Force
+$null = New-Item -Path $npp_dir -ItemType Directory -Force
 $shell = new-object -com shell.application
 $shell.namespace($npp_dir).copyhere($shell.namespace("$npp_zipfile").items(), 0x14) 
 
@@ -87,7 +87,7 @@ $python_ftypes = @(
 
 
 # Add handler for python27
-"Adding handler for python27 to the registry" | Out-Default
+"Adding handler for python27 to the registry..." | Out-Default
 iex @'
 reg add `"HKCU\Software\Classes\Applications\python.exe\shell\open\command`" /ve /t REG_SZ /d `"\`"${python27_dir}\python.exe\`" \`"%1\`" %*`" /f
 '@
@@ -111,7 +111,7 @@ $text_ftypes = @(
 
 
 # Add handler for npp
-"Adding handler for notepad++ to the registry" | Out-Default
+"Adding handler for notepad++ to the registry..." | Out-Default
 iex @'
 reg add `"HKCU\Software\Classes\Applications\notepad++.exe\shell\open\command`" /ve /t REG_SZ /d `"\`"${npp_dir}\notepad++.exe\`" \`"%1\`"`" /f
 '@
@@ -127,24 +127,24 @@ reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\Us
 
 
 # Get msysgit installer
-"Downloading msysgit" | Out-Default
+"Downloading msysgit..." | Out-Default
 $msysgit_installer = "${download_dir}\msysgit.exe"
 (new-object net.webclient).DownloadFile("${msysgit_url}","${msysgit_installer}")
 
 
 # Install msysgit
 "Stopping ssh-agent..." | Out-Default
-stop-process -Name ssh-agent -ErrorAction silentlycontinue
+$null = Stop-Process -Name ssh-agent -ErrorAction SilentlyContinue
 
-"Installing msysgit" | Out-Default
+"Installing msysgit..." | Out-Default
 $msysgit_dir = "${program_dir}\Git"
-New-Item -Path $msysgit_dir -ItemType Directory -Force
+$null = New-Item -Path $msysgit_dir -ItemType Directory -Force
 $msysgit_params = "-y -gm2 -InstallPath=`"${msysgit_dir}`""
-Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -NoNewWindow -PassThru -Wait
+$null = Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -NoNewWindow -PassThru -Wait
 
 
 # Setup basic git settings
-"Configuring basic git settings" | Out-Default
+"Configuring basic git settings..." | Out-Default
 $env:path += ";${msysgit_dir}\cmd;${msysgit_dir}\bin"
 iex "git config --global user.name `"${git_username}`""
 iex "git config --global user.email `"${git_email}`""
@@ -155,11 +155,11 @@ iex "git config --global push.default simple"
 
 
 # Configure ssh over https
-"Configuring ssh to work over https" | Out-Default
+"Configuring ssh to work over https..." | Out-Default
 $ssh_dir = "${env:userprofile}\.ssh"
 $ssh_config_file = "${ssh_dir}\config"
-New-Item -Path $ssh_dir -ItemType Directory -Force
-New-Item -Path $ssh_config_file -ItemType File -ErrorAction SilentlyContinue
+$null = New-Item -Path $ssh_dir -ItemType Directory -Force
+$null = New-Item -Path $ssh_config_file -ItemType File -ErrorAction SilentlyContinue
 $ssh_config_contents = @(Get-Content -Path $ssh_config_file)
 $ssh_config = @()
 $ssh_config += "Host github.com"
@@ -172,11 +172,11 @@ if (-not $ssh_config_contents -contains "Host github.com") {
 
 
 # Setup PowerShell Profile
-"Setting up PowerShell profile" | Out-Default
+"Setting up PowerShell profile..." | Out-Default
 $ps_profile_dir = "${env:userprofile}\Documents\WindowsPowerShell"
 $ps_profile = "${ps_profile_dir}\Microsoft.PowerShell_profile.ps1"
-New-Item -Path $ps_profile_dir -ItemType Directory -Force
-New-Item -Path $ps_profile -ItemType File -ErrorAction SilentlyContinue
+$null = New-Item -Path $ps_profile_dir -ItemType Directory -Force
+$null = New-Item -Path $ps_profile -ItemType File -ErrorAction SilentlyContinue
 $ps_profile_contents = @()
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\bin"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\usr\bin"'
@@ -195,6 +195,7 @@ Set-ExecutionPolicy RemoteSigned -Scope CurrentUser -Force
 cd "${program_dir}"
 iex "git clone ${poshgit_url}"
 cd posh-git
+iex "git pull"
 iex ".\install.ps1"
 
 

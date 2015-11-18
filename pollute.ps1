@@ -12,22 +12,22 @@ Param(
     ,
     [Parameter(Mandatory=$false)]
     [string[]] $prepend_whitelist=@(
-		".png"
+        ".png"
         ".jpg"
-	)
+    )
     ,
     [Parameter(Mandatory=$false)]
     [string] $rename_ext=".txt"
     ,
     [Parameter(Mandatory=$false)]
     [string[]] $rename_whitelist=@(
-		".png"
+        ".png"
         ".jpg"
-	)
+    )
     ,
     [Parameter(Mandatory=$false)]
     [string[]] $encode_types=@(
-		".exe"
+        ".exe"
         ".rpm"
         ".msi"
         ".pdf"
@@ -38,7 +38,13 @@ Param(
         ".tar"
         ".gz"
         ".mpp"
-	)
+        ".sls"
+        ".adml"
+        ".admx"
+        ".py"
+        ".wsf"
+        ".template"
+    )
     ,
     [Parameter(Mandatory=$false)]
     [string] $exclude_regex="\.git\\|Thumbs\.db$"
@@ -56,20 +62,20 @@ BEGIN {
             [string] $FilePath
         )
 
-        try 
+        try
         {
             $ByteArray = [System.IO.File]::ReadAllBytes($FilePath);
         }
-        catch 
+        catch
         {
             throw "Failed to read file. Please ensure that you have permission to the file, and that the file path is correct.";
         }
 
-        if ($ByteArray) 
+        if ($ByteArray)
         {
             $Base64String = [System.Convert]::ToBase64String($ByteArray);
         }
-        else 
+        else
         {
             throw '$ByteArray is $null.';
         }
@@ -94,7 +100,7 @@ PROCESS {
 
 		# Construct the destination path
 		$dest = "${dest_root}\$(${s_dir}.name)"
-		
+
 		# If the destination path exists, remove it
 		if (Test-Path $dest) {
 			if (-not $force) {

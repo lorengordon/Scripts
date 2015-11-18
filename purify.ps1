@@ -15,13 +15,13 @@ Param(
     ,
     [Parameter(Mandatory=$false)]
     [string[]] $strip_firstline_whitelist=@(
-		".png"
+        ".png"
         ".jpg"
-	)
+    )
     ,
     [Parameter(Mandatory=$false)]
     [string[]] $decode_types=@(
-		".exe"
+        ".exe"
         ".rpm"
         ".msi"
         ".pdf"
@@ -32,7 +32,13 @@ Param(
         ".tar"
         ".gz"
         ".mpp"
-	)
+        ".sls"
+        ".adml"
+        ".admx"
+        ".py"
+        ".wsf"
+        ".template"
+    )
     ,
     [Parameter(Mandatory=$false)]
     [switch] $force

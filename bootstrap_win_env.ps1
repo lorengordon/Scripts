@@ -13,16 +13,16 @@ Param(
     [string] $program_dir="${env:userprofile}\Documents\Programs"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $python27_url="https://www.python.org/ftp/python/2.7.10/python-2.7.10.amd64.msi"
+    [string] $python27_url="https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi"
     ,
     [Parameter(Mandatory=$false)]
     [string] $vc_python27_url="http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.8.6/npp.6.8.6.bin.zip"
+    [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.8.8/npp.6.8.8.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.6.2.windows.1/PortableGit-2.6.2-64-bit.7z.exe"
+    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.7.0.windows.1/PortableGit-2.7.0-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
     [string] $poshgit_url = "https://github.com/dahlbyk/posh-git.git"
@@ -127,7 +127,7 @@ reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\Us
 
 
 # Get msysgit installer
-"Downloading msysgit..." | Out-Default
+"Downloading git for windows..." | Out-Default
 $msysgit_installer = "${download_dir}\msysgit.exe"
 (new-object net.webclient).DownloadFile("${msysgit_url}","${msysgit_installer}")
 
@@ -136,7 +136,7 @@ $msysgit_installer = "${download_dir}\msysgit.exe"
 "Stopping ssh-agent..." | Out-Default
 $null = Stop-Process -Name ssh-agent -ErrorAction SilentlyContinue
 
-"Installing msysgit..." | Out-Default
+"Installing git for windows..." | Out-Default
 $msysgit_dir = "${program_dir}\Git"
 $null = New-Item -Path $msysgit_dir -ItemType Directory -Force
 $msysgit_params = "-y -gm2 -InstallPath=`"${msysgit_dir}`""

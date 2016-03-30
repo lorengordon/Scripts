@@ -22,7 +22,7 @@ Param(
     [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.9.1/npp.6.9.1.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.8.0.windows.1/PortableGit-2.8.0-64-bit.7z.exe"
+    [string] $gitforwindows_url="https://github.com/git-for-windows/git/releases/download/v2.8.0.windows.1/PortableGit-2.8.0-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
     [string] $poshgit_url = "https://github.com/dahlbyk/posh-git.git"
@@ -126,26 +126,26 @@ reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\Us
 }
 
 
-# Get msysgit installer
+# Get git for windows installer
 "Downloading git for windows..." | Out-Default
-$msysgit_installer = "${download_dir}\msysgit.exe"
-(new-object net.webclient).DownloadFile("${msysgit_url}","${msysgit_installer}")
+$gitforwindows_installer = "${download_dir}\gitforwindows.exe"
+(new-object net.webclient).DownloadFile("${gitforwindows_url}","${gitforwindows_installer}")
 
 
-# Install msysgit
+# Install git for windows
 "Stopping ssh-agent..." | Out-Default
 $null = Stop-Process -Name ssh-agent -ErrorAction SilentlyContinue
 
 "Installing git for windows..." | Out-Default
-$msysgit_dir = "${program_dir}\Git"
-$null = New-Item -Path $msysgit_dir -ItemType Directory -Force
-$msysgit_params = "-y -gm2 -InstallPath=`"${msysgit_dir}`""
-$null = Start-Process -FilePath ${msysgit_installer} -ArgumentList ${msysgit_params} -NoNewWindow -PassThru -Wait
+$gitforwindows_dir = "${program_dir}\Git"
+$null = New-Item -Path $gitforwindows_dir -ItemType Directory -Force
+$gitforwindows_params = "-y -gm2 -InstallPath=`"${gitforwindows_dir}`""
+$null = Start-Process -FilePath ${gitforwindows_installer} -ArgumentList ${gitforwindows_params} -NoNewWindow -PassThru -Wait
 
 
 # Setup basic git settings
 "Configuring basic git settings..." | Out-Default
-$env:path += ";${msysgit_dir}\cmd;${msysgit_dir}\bin"
+$env:path += ";${gitforwindows_dir}\cmd;${gitforwindows_dir}\bin"
 iex "git config --global user.name `"${git_username}`""
 iex "git config --global user.email `"${git_email}`""
 iex "git config --global core.autocrlf false"

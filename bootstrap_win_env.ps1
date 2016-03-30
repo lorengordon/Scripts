@@ -19,10 +19,10 @@ Param(
     [string] $vc_python27_url="http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.8.8/npp.6.8.8.bin.zip"
+    [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.9.1/npp.6.9.1.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.7.0.windows.1/PortableGit-2.7.0-64-bit.7z.exe"
+    [string] $msysgit_url="https://github.com/git-for-windows/git/releases/download/v2.8.0.windows.1/PortableGit-2.8.0-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
     [string] $poshgit_url = "https://github.com/dahlbyk/posh-git.git"

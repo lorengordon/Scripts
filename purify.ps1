@@ -38,6 +38,7 @@ Param(
         ".py"
         ".wsf"
         ".template"
+        ".bundle"
     )
     ,
     [Parameter(Mandatory=$false)]

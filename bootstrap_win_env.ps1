@@ -28,6 +28,7 @@ Param(
     [string] $gitforwindows_url="https://github.com/git-for-windows/git/releases/download/v2.8.0.windows.1/PortableGit-2.8.0-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
+
     [string] $poshgit_url = "https://github.com/dahlbyk/posh-git.git"
 )
 
@@ -59,7 +60,7 @@ $vc_python27_installer = "${download_dir}\vc_python27.msi"
 (new-object net.webclient).DownloadFile("${vc_python27_url}","${vc_python27_installer}")
 
 
-# Install python
+# Install vc_python27 installer
 "Installing vc python27 compiler..." | Out-Default
 $vc_python27_params = "/i `"${vc_python27_installer}`" /quiet /qn /norestart"
 $null = Start-Process -FilePath msiexec -ArgumentList ${vc_python27_params} -NoNewWindow -PassThru -Wait

@@ -22,6 +22,9 @@ Param(
     [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.9.1/npp.6.9.1.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
+    [string] $atom_url="https://github.com/atom/atom/releases/download/v1.7.3/atom-windows.zip"
+    ,
+    [Parameter(Mandatory=$false)]
     [string] $gitforwindows_url="https://github.com/git-for-windows/git/releases/download/v2.8.0.windows.1/PortableGit-2.8.0-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
@@ -73,7 +76,21 @@ $npp_zipfile = "${download_dir}\npp.zip"
 $npp_dir = "${program_dir}\npp"
 $null = New-Item -Path $npp_dir -ItemType Directory -Force
 $shell = new-object -com shell.application
-$shell.namespace($npp_dir).copyhere($shell.namespace("$npp_zipfile").items(), 0x14) 
+$shell.namespace($npp_dir).copyhere($shell.namespace("$npp_zipfile").items(), 0x14)
+
+
+# Get atom zip file
+"Downloading atom..." | Out-Default
+$atom_zipfile = "${download_dir}\atom-windows.zip"
+(new-object net.webclient).DownloadFile("${atom_url}","${atom_zipfile}")
+
+
+# Unzip atom
+"Installing atom..." | Out-Default
+$atom_dir = "${program_dir}\atom"
+$null = New-Item -Path $atom_dir -ItemType Directory -Force
+$shell = new-object -com shell.application
+$shell.namespace($atom_dir).copyhere($shell.namespace("$atom_zipfile").items(), 0x14)
 
 
 #TODO: Use ftypes and assoc to build the list of text file types automatically
@@ -104,24 +121,25 @@ reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\Us
 
 # List of text file types handled by notepad by default
 $text_ftypes = @(
-	".compositefont", ".css", ".dic", ".exc", ".gitattributes", ".gitignore"
-	".gitmodules", ".inf", ".ini", ".log", ".oqy", ".ps1", ".ps1xml", ".psd1"
-	".psm1", ".rqy", ".scp", ".sct", ".txt", ".wsc", ".wtx"
+	".compositefont", ".css", ".dic", ".example", ".exc", ".gitattributes"
+  ".gitignore", ".gitmodules", ".inf", ".ini", ".log", ".md", ".oqy", ".ps1"
+  ".ps1xml", ".psd1", ".psm1", ".rqy", ".scp", ".sct", ".sh", ".sls", ".txt"
+  ".wsc", ".wtx", ".yaml", ".yml"
 )
 
 
-# Add handler for npp
-"Adding handler for notepad++ to the registry..." | Out-Default
+# Add handler for atom
+"Adding handler for atom to the registry..." | Out-Default
 iex @'
-reg add `"HKCU\Software\Classes\Applications\notepad++.exe\shell\open\command`" /ve /t REG_SZ /d `"\`"${npp_dir}\notepad++.exe\`" \`"%1\`"`" /f
+reg add `"HKCU\Software\Classes\Applications\atom.exe\shell\open\command`" /ve /t REG_SZ /d `"\`"${atom_dir}\Atom\atom.exe\`" \`"%1\`"`" /f
 '@
 
 
-# Make npp the default for all text file types
+# Make atom the default for all text file types
 $text_ftypes | % {
-	"Making notepad++ the default handler for file type: $_" | Out-Default
+	"Making atom the default handler for file type: $_" | Out-Default
 	iex @'
-reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\UserChoice`" /v `"Progid`" /t REG_SZ /d `"Applications\notepad++.exe`" /f
+reg add `"HKCU\Software\Microsoft\Windows\CurrentVersion\Explorer\FileExts\$_\UserChoice`" /v `"Progid`" /t REG_SZ /d `"Applications\atom.exe`" /f
 '@
 }
 
@@ -182,6 +200,7 @@ $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Gi
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\usr\bin"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27"'
 $ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27\Scripts"'
+$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\atom\Atom"'
 $ps_profile_contents += '$env:path += ";${env:localappdata}\Programs\Common\Microsoft\Visual C++ for Python\9.0"'
 $ps_profile_contents += 'set-alias npp "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
 $ps_profile_contents += 'set-alias notepad "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'

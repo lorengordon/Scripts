@@ -12,7 +12,7 @@ while true; do
         echo expired before network was ready.
         echo Exiting with failure.
         exit 1
-    done
+    fi
     ping -c 1 $host > /dev/null 2>&1 && break  # break loop if ping succeeds
     echo "Waiting $delay seconds before trying again. Will timeout if not reachable within $timer second."
     sleep $delay

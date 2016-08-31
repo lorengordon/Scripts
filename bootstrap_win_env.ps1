@@ -13,19 +13,19 @@ Param(
     [string] $program_dir="${env:userprofile}\Documents\Programs"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $python27_url="https://www.python.org/ftp/python/2.7.11/python-2.7.11.amd64.msi"
+    [string] $python27_url="https://www.python.org/ftp/python/2.7.12/python-2.7.12.amd64.msi"
     ,
     [Parameter(Mandatory=$false)]
     [string] $vc_python27_url="http://download.microsoft.com/download/7/9/6/796EF2E4-801B-4FC4-AB28-B59FBF6D907B/VCForPython27.msi"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.9.1/npp.6.9.1.bin.zip"
+    [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.9.2/npp.6.9.2.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $atom_url="https://github.com/atom/atom/releases/download/v1.7.3/atom-windows.zip"
+    [string] $atom_url="https://github.com/atom/atom/releases/download/v1.9.9/atom-windows.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $gitforwindows_url="https://github.com/git-for-windows/git/releases/download/v2.8.0.windows.1/PortableGit-2.8.0-64-bit.7z.exe"
+    [string] $gitforwindows_url="https://github.com/git-for-windows/git/releases/download/v2.9.3.windows.2/PortableGit-2.9.3.2-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
 

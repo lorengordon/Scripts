@@ -22,10 +22,10 @@ Param(
     [string] $npp_url="https://notepad-plus-plus.org/repository/6.x/6.9.2/npp.6.9.2.bin.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $atom_url="https://github.com/atom/atom/releases/download/v1.9.9/atom-windows.zip"
+    [string] $atom_url="https://github.com/atom/atom/releases/download/v1.10.2/atom-windows.zip"
     ,
     [Parameter(Mandatory=$false)]
-    [string] $gitforwindows_url="https://github.com/git-for-windows/git/releases/download/v2.9.3.windows.2/PortableGit-2.9.3.2-64-bit.7z.exe"
+    [string] $gitforwindows_url="https://github.com/git-for-windows/git/releases/download/v2.10.0.windows.1/PortableGit-2.10.0-64-bit.7z.exe"
     ,
     [Parameter(Mandatory=$false)]
 

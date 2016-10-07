@@ -7,7 +7,7 @@ Param(
     [string] $git_email
     ,
     [Parameter(Mandatory=$false)]
-    [string] $download_dir="${env:userprofile}\Downloads"
+    [string] $download_dir="${env:Temp}"
     ,
     [Parameter(Mandatory=$false)]
     [string] $program_dir="${env:userprofile}\Documents\Programs"
@@ -192,19 +192,20 @@ if (-not $ssh_config_contents -contains "Host github.com") {
 
 # Setup PowerShell Profile
 "Setting up PowerShell profile..." | Out-Default
-$ps_profile_dir = "${env:userprofile}\Documents\WindowsPowerShell"
+$ps_profile_dir = "$([Environment]::GetFolderPath('MyDocuments'))\WindowsPowerShell"
 $ps_profile = "${ps_profile_dir}\Microsoft.PowerShell_profile.ps1"
 $null = New-Item -Path $ps_profile_dir -ItemType Directory -Force
 $null = New-Item -Path $ps_profile -ItemType File -ErrorAction SilentlyContinue
 $ps_profile_contents = @()
-$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\bin"'
-$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Git\usr\bin"'
-$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27"'
-$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\Python27\Scripts"'
-$ps_profile_contents += '$env:path += ";${env:userprofile}\Documents\Programs\atom\Atom"'
+$ps_profile_contents += "`$program_dir = `"${program_dir}`""
+$ps_profile_contents += '$env:path += ";${program_dir}\Git\bin"'
+$ps_profile_contents += '$env:path += ";${program_dir}\Git\usr\bin"'
+$ps_profile_contents += '$env:path += ";${program_dir}\Python27"'
+$ps_profile_contents += '$env:path += ";${program_dir}\Python27\Scripts"'
+$ps_profile_contents += '$env:path += ";${program_dir}\atom\Atom"'
 $ps_profile_contents += '$env:path += ";${env:localappdata}\Programs\Common\Microsoft\Visual C++ for Python\9.0"'
-$ps_profile_contents += 'set-alias npp "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
-$ps_profile_contents += 'set-alias notepad "${env:userprofile}\Documents\Programs\npp\notepad++.exe"'
+$ps_profile_contents += 'set-alias npp "${program_dir}\npp\notepad++.exe"'
+$ps_profile_contents += 'set-alias notepad "${program_dir}\npp\notepad++.exe"'
 $ps_profile_contents = $ps_profile_contents | where { !(Select-String -SimpleMatch "${_}" -Path ${ps_profile} -Quiet)}
 $ps_profile_contents,(Get-Content -Path $ps_profile) | Set-Content -Path ${ps_profile}
 
